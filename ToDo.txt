@@ -1,0 +1,3 @@
+-Fix windows/android build 
+- get screenshots of pre-existing app and place into google drive. 
+Get base timer setting to work. 
