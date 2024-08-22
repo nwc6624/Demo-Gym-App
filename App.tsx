@@ -1,13 +1,15 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, Button, StyleSheet } from 'react-native';
 
-const App = () => {
+export default function App() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Welcome to My React LOL Native App!</Text>
+      <Text style={styles.timerText}>60s</Text>
+      <Button title="Start" onPress={() => {}} />
+      <Button title="Reset" onPress={() => {}} />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -16,10 +18,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
   },
-  text: {
-    fontSize: 24,
+  timerText: {
+    fontSize: 48,
     fontWeight: 'bold',
+    marginBottom: 20,
   },
 });
-
-export default App;
