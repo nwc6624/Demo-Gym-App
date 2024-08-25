@@ -1,26 +1,25 @@
 import React from 'react';
-import { Text, View, Button, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import MyComponent from './components/MyComponent';
+import StandardTimer from './components/StandardTimer';
+import RoundTimer from './components/RoundTimer';
+import IntervalTimer from './components/IntervalTimer';
+import { RootStackParamList } from './types'; // Import the type
 
-export default function App() {
+const Stack = createStackNavigator<RootStackParamList>();
+
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.timerText}>60s</Text>
-      <Button title="Start" onPress={() => {}} />
-      <Button title="Reset" onPress={() => {}} />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={MyComponent} />
+        <Stack.Screen name="StandardTimer" component={StandardTimer} />
+        <Stack.Screen name="RoundTimer" component={RoundTimer} />
+        <Stack.Screen name="IntervalTimer" component={IntervalTimer} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-  },
-  timerText: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-});
+export default App;
