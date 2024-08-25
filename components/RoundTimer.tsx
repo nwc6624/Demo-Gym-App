@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Picker } from '@react-native-picker/picker';
@@ -14,6 +14,37 @@ const RoundTimer: React.FC = () => {
     const [warnings, setWarnings] = useState('Off');
     const [metronome, setMetronome] = useState('Off');
     const [restPeriodDirection, setRestPeriodDirection] = useState('Match Workout');
+    const [currentRound, setCurrentRound] = useState(0);
+    const [timeRemaining, setTimeRemaining] = useState(0);
+    const [isRunning, setIsRunning] = useState(false);
+
+    useEffect(() => {
+        if (isRunning && timeRemaining > 0) {
+            const timer = setTimeout(() => {
+                setTimeRemaining(timeRemaining - 1);
+            }, 1000);
+
+            return () => clearTimeout(timer);
+        } else if (isRunning && timeRemaining === 0) {
+            if (currentRound < rounds) {
+                setCurrentRound(currentRound + 1);
+                setTimeRemaining(parseDuration(roundDuration)); // Start the next round
+            } else {
+                setIsRunning(false); // Stop the timer when all rounds are complete
+            }
+        }
+    }, [isRunning, timeRemaining, currentRound]);
+
+    const parseDuration = (duration) => {
+        const [minutes, seconds] = duration.split(':').map(Number);
+        return minutes * 60 + seconds;
+    };
+
+    const startTimer = () => {
+        setIsRunning(true);
+        setCurrentRound(1);
+        setTimeRemaining(parseDuration(roundDuration));
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -40,6 +71,7 @@ const RoundTimer: React.FC = () => {
                     keyboardType="numeric"
                 />
             </View>
+
             <View style={styles.optionContainer}>
                 <Text style={styles.optionLabel}>Round duration</Text>
                 <Picker
@@ -66,91 +98,14 @@ const RoundTimer: React.FC = () => {
                 </Picker>
             </View>
 
-            <View style={styles.optionContainer}>
-                <Text style={styles.optionLabel}>Flex Timer status shows</Text>
-                <Picker
-                    selectedValue={flexTimerStatus}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setFlexTimerStatus(itemValue)}
-                >
-                    <Picker.Item label="Round" value="Round" />
-                    <Picker.Item label="Time" value="Time" />
-                </Picker>
+            {/* Continue with other options... */}
+
+            <View style={styles.timerDisplay}>
+                <Text style={styles.timerText}>Round: {currentRound}/{rounds}</Text>
+                <Text style={styles.timerText}>Time Remaining: {`${Math.floor(timeRemaining / 60)}:${('0' + (timeRemaining % 60)).slice(-2)}`}</Text>
             </View>
 
-            <View style={styles.optionContainer}>
-                <Text style={styles.optionLabel}>Direction</Text>
-                <Picker
-                    selectedValue={direction}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setDirection(itemValue)}
-                >
-                    <Picker.Item label="Up" value="Up" />
-                    <Picker.Item label="Down" value="Down" />
-                </Picker>
-            </View>
-
-            <View style={styles.optionContainer}>
-                <Text style={styles.optionLabel}>Prelude</Text>
-                <Picker
-                    selectedValue={prelude}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setPrelude(itemValue)}
-                >
-                    <Picker.Item label="10s" value="10s" />
-                    <Picker.Item label="20s" value="20s" />
-                </Picker>
-            </View>
-
-            <View style={styles.optionContainer}>
-                <Text style={styles.optionLabel}>Segues</Text>
-                <Picker
-                    selectedValue={segues}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setSegues(itemValue)}
-                >
-                    <Picker.Item label="On" value="On" />
-                    <Picker.Item label="Off" value="Off" />
-                </Picker>
-            </View>
-
-            <View style={styles.optionContainer}>
-                <Text style={styles.optionLabel}>Time Remaining Warnings</Text>
-                <Picker
-                    selectedValue={warnings}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setWarnings(itemValue)}
-                >
-                    <Picker.Item label="Off" value="Off" />
-                    <Picker.Item label="On" value="On" />
-                </Picker>
-            </View>
-
-            <View style={styles.optionContainer}>
-                <Text style={styles.optionLabel}>Metronome</Text>
-                <Picker
-                    selectedValue={metronome}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setMetronome(itemValue)}
-                >
-                    <Picker.Item label="Off" value="Off" />
-                    <Picker.Item label="On" value="On" />
-                </Picker>
-            </View>
-
-            <View style={styles.optionContainer}>
-                <Text style={styles.optionLabel}>Rest Period Direction</Text>
-                <Picker
-                    selectedValue={restPeriodDirection}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setRestPeriodDirection(itemValue)}
-                >
-                    <Picker.Item label="Match Workout" value="Match Workout" />
-                    <Picker.Item label="Opposite" value="Opposite" />
-                </Picker>
-            </View>
-
-            <TouchableOpacity style={styles.startButton}>
+            <TouchableOpacity style={styles.startButton} onPress={startTimer}>
                 <Text style={styles.startButtonText}>Start</Text>
             </TouchableOpacity>
         </ScrollView>
@@ -210,6 +165,14 @@ const styles = StyleSheet.create({
         height: 50,
         width: 150,
     },
+    timerDisplay: {
+        marginTop: 30,
+        alignItems: 'center',
+    },
+    timerText: {
+        fontSize: 24,
+        color: '#800080',
+    },
     startButton: {
         backgroundColor: '#800080',
         padding: 15,
@@ -225,3 +188,4 @@ const styles = StyleSheet.create({
 });
 
 export default RoundTimer;
+
