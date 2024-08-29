@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -13,13 +13,29 @@ const RoundTimer: React.FC = () => {
     const [timerStarted, setTimerStarted] = useState(false);
     const [currentRound, setCurrentRound] = useState(0);
     const [remainingTime, setRemainingTime] = useState(roundDuration);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         if (timerStarted) {
-            setRemainingTime(roundDuration); // Reset the timer when the round duration is edited
-            setCurrentRound(0); // Reset the current round
+            resetTimer(); // Reset the timer when the round duration or number of rounds is edited
         }
     }, [roundDuration, rounds]);
+
+    useEffect(() => {
+        if (timerStarted && remainingTime === 0) {
+            if (currentRound < rounds) {
+                if (restBetweenRounds && restDuration > 0) {
+                    setRemainingTime(restDuration);
+                    // Handle rest period logic here
+                } else {
+                    setCurrentRound(currentRound + 1);
+                    setRemainingTime(roundDuration);
+                }
+            } else {
+                resetTimer();
+            }
+        }
+    }, [remainingTime, timerStarted]);
 
     const handleSaveRounds = () => {
         setIsEditingRounds(false);
@@ -33,9 +49,13 @@ const RoundTimer: React.FC = () => {
 
     const handleSaveRestDuration = () => {
         setIsEditingRestDuration(false);
+        resetTimer();
     };
 
     const resetTimer = () => {
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+        }
         setTimerStarted(false);
         setRemainingTime(roundDuration);
         setCurrentRound(0);
@@ -43,7 +63,19 @@ const RoundTimer: React.FC = () => {
 
     const handleStartTimer = () => {
         setTimerStarted(true);
-        // Implement the timer logic here
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+        }
+        timerRef.current = setInterval(() => {
+            setRemainingTime((prev) => prev - 1);
+        }, 1000);
+    };
+
+    const handlePauseTimer = () => {
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+        }
+        setTimerStarted(false);
     };
 
     return (
@@ -125,9 +157,21 @@ const RoundTimer: React.FC = () => {
                 </View>
             )}
 
-            <TouchableOpacity style={styles.startButton} onPress={handleStartTimer}>
-                <Text style={styles.startButtonText}>Start</Text>
-            </TouchableOpacity>
+            <View style={styles.timerControls}>
+                <TouchableOpacity style={styles.startButton} onPress={handleStartTimer}>
+                    <Text style={styles.startButtonText}>{timerStarted ? 'Restart' : 'Start'}</Text>
+                </TouchableOpacity>
+                {timerStarted && (
+                    <TouchableOpacity style={styles.pauseButton} onPress={handlePauseTimer}>
+                        <Text style={styles.pauseButtonText}>Pause</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+
+            <View style={styles.timerDisplay}>
+                <Text style={styles.timerText}>{remainingTime} seconds</Text>
+                <Text style={styles.roundText}>Round {currentRound + 1} / {rounds}</Text>
+            </View>
         </ScrollView>
     );
 };
@@ -194,6 +238,39 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
+    pauseButton: {
+        backgroundColor: '#FFA500',
+        padding: 15,
+        borderRadius: 50,
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    pauseButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    timerControls: {
+        alignItems: 'center',
+    },
+    timerDisplay: {
+        alignItems: 'center',
+        marginTop: 30,
+    },
+    timerText: {
+        fontSize: 48,
+        color: '#800080',
+        fontWeight: 'bold',
+    },
+    roundText: {
+        fontSize: 24,
+        color: '#555',
+        marginTop: 10,
+    },
+});
+
+export default RoundTimer;
+
 });
 
 export default RoundTimer;
