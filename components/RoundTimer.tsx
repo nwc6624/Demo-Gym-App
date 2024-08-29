@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -10,17 +10,40 @@ const RoundTimer: React.FC = () => {
     const [isEditingRounds, setIsEditingRounds] = useState(false);
     const [isEditingRoundDuration, setIsEditingRoundDuration] = useState(false);
     const [isEditingRestDuration, setIsEditingRestDuration] = useState(false);
+    const [timerStarted, setTimerStarted] = useState(false);
+    const [currentRound, setCurrentRound] = useState(0);
+    const [remainingTime, setRemainingTime] = useState(roundDuration);
+
+    useEffect(() => {
+        if (timerStarted) {
+            setRemainingTime(roundDuration); // Reset the timer when the round duration is edited
+            setCurrentRound(0); // Reset the current round
+        }
+    }, [roundDuration, rounds]);
 
     const handleSaveRounds = () => {
         setIsEditingRounds(false);
+        resetTimer();
     };
 
     const handleSaveRoundDuration = () => {
         setIsEditingRoundDuration(false);
+        resetTimer();
     };
 
     const handleSaveRestDuration = () => {
         setIsEditingRestDuration(false);
+    };
+
+    const resetTimer = () => {
+        setTimerStarted(false);
+        setRemainingTime(roundDuration);
+        setCurrentRound(0);
+    };
+
+    const handleStartTimer = () => {
+        setTimerStarted(true);
+        // Implement the timer logic here
     };
 
     return (
@@ -102,7 +125,7 @@ const RoundTimer: React.FC = () => {
                 </View>
             )}
 
-            <TouchableOpacity style={styles.startButton}>
+            <TouchableOpacity style={styles.startButton} onPress={handleStartTimer}>
                 <Text style={styles.startButtonText}>Start</Text>
             </TouchableOpacity>
         </ScrollView>
@@ -174,3 +197,4 @@ const styles = StyleSheet.create({
 });
 
 export default RoundTimer;
+
