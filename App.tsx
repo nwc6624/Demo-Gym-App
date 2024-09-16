@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import MyComponent from './components/MyComponent';
 import StandardTimer from './components/StandardTimer';
-import RoundTimer from './components/RoundTimer';
+import RoundTimer from './components/RoundTimer'; //typo corrected 
 import IntervalTimer from './components/IntervalTimer';
 import { RootStackParamList } from './types'; // Import the type
 
