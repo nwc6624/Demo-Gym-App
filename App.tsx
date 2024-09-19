@@ -7,6 +7,9 @@ import RoundTimer from './components/RoundTimer'; //typo corrected
 import IntervalTimer from './components/IntervalTimer';
 import { RootStackParamList } from './types'; // Import the type
 
+
+
+/////true?
 const Stack = createStackNavigator<RootStackParamList>();
 
 const App = () => {
